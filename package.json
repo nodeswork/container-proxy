@@ -1,6 +1,6 @@
 {
   "name": "@nodeswork/container-proxy",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Container proxy for applet to access network",
   "main": "index.js",
   "scripts": {
