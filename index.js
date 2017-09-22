@@ -30,13 +30,12 @@ var server = http.createServer(function(req, res) {
     console.log('headers', req.headers);
     console.log('url', req.url);
     console.log('method', req.method);
-    console.log('target', target);
-
     if (req.headers['x-route-to'] === 'INTERNAL' && hostname.startsWith('na-')) {
       target = hostname;
     } else {
       target = NAM_HOST;
     }
+    console.log('target', target);
 
     proxy.web(req, res, { target });
   } catch (e) {
