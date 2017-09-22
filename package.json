@@ -1,0 +1,27 @@
+{
+  "name": "@nodeswork/container-proxy",
+  "version": "0.0.0",
+  "description": "Container proxy for applet to access network",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodeswork/container-proxy.git"
+  },
+  "keywords": [
+    "nodeswork",
+    "container-proxy"
+  ],
+  "author": "andy@nodeswork.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/nodeswork/container-proxy/issues"
+  },
+  "homepage": "https://github.com/nodeswork/container-proxy#readme",
+  "dependencies": {
+    "http-proxy": "^1.16.2",
+    "ip": "^1.1.5"
+  }
+}
