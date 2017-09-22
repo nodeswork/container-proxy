@@ -1,6 +1,5 @@
 var http       = require('http'),
     httpProxy  = require('http-proxy')
-    ip         = require('ip'),
     url        = require('url');
 
 var proxy = httpProxy.createProxyServer({});
@@ -14,12 +13,6 @@ if (NAM_HOST == null) {
   process.exit(1);
 }
 
-var subnet;
-
-if (SUB_NET != null) {
-  subnet = ip.cidrSubnet(SUB_NET);
-}
-
 var server = http.createServer(function(req, res) {
   if (req.url === '/sstats') {
     res.writeHead(200, {
@@ -31,19 +24,19 @@ var server = http.createServer(function(req, res) {
 
   try {
     const targetUrl = new url.URL(req.url);
-    const hostname  =targetUrl.hostname;
+    const hostname  = targetUrl.hostname;
     var target;
-
-    if (subnet && subnet.contains(hostname)) {
-      target = hostname;
-    } else {
-      target = NAM_HOST;
-    }
 
     console.log('headers', req.headers);
     console.log('url', req.url);
     console.log('method', req.method);
     console.log('target', target);
+
+    if (req.headers['X-ROUTE-TO'] === 'INTERNAL' && hostname.startsWith('na-')) {
+      target = hostname;
+    } else {
+      target = NAM_HOST;
+    }
 
     proxy.web(req, res, { target });
   } catch (e) {
