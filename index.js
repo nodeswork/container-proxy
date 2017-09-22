@@ -6,7 +6,8 @@ var http       = require('http'),
 var proxy = httpProxy.createProxyServer({});
 
 const SUB_NET    = process.env.SUB_NET,
-      NAM_HOST   = process.env.NAM_HOST;
+      NAM_HOST   = process.env.NAM_HOST,
+      PORT       = process.env.PORT || 80;
 
 if (NAM_HOST == null) {
   console.error('NAM_HOST is not specified.');
@@ -33,11 +34,12 @@ var server = http.createServer(function(req, res) {
   console.log('headers', req.headers);
   console.log('url', req.url);
   console.log('method', req.method);
+  console.log('target', target);
 
   proxy.web(req, res, { target });
 });
 
-server.listen(8080);
+server.listen(PORT);
 
 // Listen for the `error` event on `proxy`.
 proxy.on('error', function (err, req, res) {
