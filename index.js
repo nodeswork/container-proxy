@@ -27,18 +27,17 @@ var server = http.createServer(function(req, res) {
     const hostname  = targetUrl.hostname;
     var target;
 
-    console.log('headers', req.headers);
-    console.log('url', req.url);
-    console.log('method', req.method);
     if (req.headers['x-route-to'] === 'INTERNAL' && hostname.startsWith('na-')) {
       target = req.url;
     } else {
       target = NAM_HOST;
     }
-    console.log('target', target);
 
     proxy.web(req, res, { target });
   } catch (e) {
+    console.error('headers', req.headers);
+    console.error('url', req.url);
+    console.error('method', req.method);
     console.error(e);
     res.writeHead(404, {
       'Content-Type': 'text/plain'
