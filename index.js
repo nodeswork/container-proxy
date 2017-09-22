@@ -21,22 +21,38 @@ if (SUB_NET != null) {
 }
 
 var server = http.createServer(function(req, res) {
-  const targetUrl = new url.URL(req.url);
-  const hostname  =targetUrl.hostname;
-  var target;
-
-  if (subnet && subnet.contains(hostname)) {
-    target = hostname;
-  } else {
-    target = NAM_HOST;
+  if (req.url === '/sstats') {
+    res.writeHead(200, {
+      'Context-Type': 'application/json'
+    });
+    res.end('{"status":"ok"}');
+    return;
   }
 
-  console.log('headers', req.headers);
-  console.log('url', req.url);
-  console.log('method', req.method);
-  console.log('target', target);
+  try {
+    const targetUrl = new url.URL(req.url);
+    const hostname  =targetUrl.hostname;
+    var target;
 
-  proxy.web(req, res, { target });
+    if (subnet && subnet.contains(hostname)) {
+      target = hostname;
+    } else {
+      target = NAM_HOST;
+    }
+
+    console.log('headers', req.headers);
+    console.log('url', req.url);
+    console.log('method', req.method);
+    console.log('target', target);
+
+    proxy.web(req, res, { target });
+  } catch (e) {
+    console.error(e);
+    res.writeHead(404, {
+      'Content-Type': 'text/plain'
+    });
+    res.end('Could not locate the destination, we are reporting a custom error message.');
+  }
 });
 
 server.listen(PORT);
