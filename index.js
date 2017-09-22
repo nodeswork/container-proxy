@@ -28,7 +28,7 @@ var server = http.createServer(function(req, res) {
     var target;
 
     if (req.headers['x-route-to'] === 'INTERNAL' && hostname.startsWith('na-')) {
-      target = req.url;
+      target = targetUrl.host;
     } else {
       target = NAM_HOST;
     }
