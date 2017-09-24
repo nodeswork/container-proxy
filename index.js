@@ -27,8 +27,10 @@ var server = http.createServer(function(req, res) {
     const hostname  = targetUrl.hostname;
     var target;
 
-    if (req.headers['x-route-to'] === 'INTERNAL' && hostname.startsWith('na-')) {
-      target = `http://${targetUrl.host}`;
+    const toApplet  = req.headers['x-to-applet'];
+
+    if (toApplet && toApplet.startsWith('na-')) {
+      target = `http://${toApplet}`;
     } else {
       target = NAM_HOST;
     }
