@@ -23,8 +23,6 @@ var server = http.createServer(function(req, res) {
   }
 
   try {
-    const targetUrl = new url.URL(req.url);
-    const hostname  = targetUrl.hostname;
     var target;
 
     const toApplet  = req.headers['x-to-applet'];
