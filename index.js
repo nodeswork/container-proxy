@@ -18,9 +18,11 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
 });
 
 var server = http.createServer(function(req, res) {
-  if (req.url === '/sstats') {
+  const toApplet  = req.headers['x-to-applet'];
+
+  if (req.url === '/sstats' && toApplet == null ) {
     res.writeHead(200, {
-      'Context-Type': 'application/json'
+      'Context-Type': 'application/json; charset=utf-8'
     });
     res.end('{"status":"ok"}');
     return;
@@ -28,20 +30,11 @@ var server = http.createServer(function(req, res) {
 
   try {
     var target;
-
-    const toApplet  = req.headers['x-to-applet'];
-
     if (toApplet && toApplet.startsWith('na-')) {
       target = `http://${toApplet}`;
     } else {
       target = NAM_HOST;
     }
-
-    console.error('headers', req.headers);
-    console.error('url', req.url);
-    console.error('method', req.method);
-    console.error('target', target);
-
     proxy.web(req, res, { target });
   } catch (e) {
     console.error('headers', req.headers);
