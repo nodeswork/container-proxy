@@ -13,6 +13,10 @@ if (NAM_HOST == null) {
   process.exit(1);
 }
 
+proxy.on('proxyRes', function (proxyRes, req, res) {
+  console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2));
+});
+
 var server = http.createServer(function(req, res) {
   if (req.url === '/sstats') {
     res.writeHead(200, {
@@ -32,6 +36,11 @@ var server = http.createServer(function(req, res) {
     } else {
       target = NAM_HOST;
     }
+
+    console.error('headers', req.headers);
+    console.error('url', req.url);
+    console.error('method', req.method);
+    console.error('target', target);
 
     proxy.web(req, res, { target });
   } catch (e) {
