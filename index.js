@@ -37,6 +37,10 @@ var server = http.createServer(function(req, res) {
   }
 
   try {
+    const requestUrl = new url.URL(req.url, `http://localhost:${PORT}`);
+    req.url = requestUrl.path;
+    LOG.info('set back url path', requestUrl.path);
+
     var target;
     if (toApplet && toApplet.startsWith('na-')) {
       target = `http://${toApplet}`;
