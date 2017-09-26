@@ -1,24 +1,32 @@
 var http       = require('http'),
     httpProxy  = require('http-proxy')
-    url        = require('url');
+    url        = require('url'),
+    logger     = require('@nodeswork/logger');
 
 var proxy = httpProxy.createProxyServer({});
 
 const SUB_NET    = process.env.SUB_NET,
       NAM_HOST   = process.env.NAM_HOST,
-      PORT       = process.env.PORT || 80;
+      PORT       = process.env.PORT || 80,
+      LOG        = logger.getLogger();
 
 if (NAM_HOST == null) {
-  console.error('NAM_HOST is not specified.');
+  LOG.error('NAM_HOST is not specified.');
   process.exit(1);
 }
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
-  console.log('RAW Response from the target', JSON.stringify(proxyRes.headers, true, 2));
+  LOG.log('RAW Response from the target', { headers: proxyRes.headers });
 });
 
 var server = http.createServer(function(req, res) {
   const toApplet  = req.headers['x-to-applet'];
+
+  LOG.info('Receive request', {
+    url: req.url,
+    headers: req.headers,
+    method: req.method,
+  });
 
   if (req.url === '/sstats' && toApplet == null ) {
     res.writeHead(200, {
@@ -37,10 +45,12 @@ var server = http.createServer(function(req, res) {
     }
     proxy.web(req, res, { target });
   } catch (e) {
-    console.error('headers', req.headers);
-    console.error('url', req.url);
-    console.error('method', req.method);
-    console.error(e);
+    LOG.error('processing error', {
+      url: req.url,
+      headers: req.headers,
+      method: req.method,
+      error: e,
+    });
     res.writeHead(404, {
       'Content-Type': 'text/plain'
     });
@@ -52,7 +62,7 @@ server.listen(PORT);
 
 // Listen for the `error` event on `proxy`.
 proxy.on('error', function (err, req, res) {
-  console.error(err);
+  LOG.error('Outer error', err);
   res.writeHead(500, {
     'Content-Type': 'text/plain'
   });
