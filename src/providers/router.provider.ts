@@ -62,9 +62,9 @@ export class RouterProvider {
     let forwarededProto  = req.headers[FORWARDED_PROTO_KEY_L]     as string;
     let forwarededTo     = req.headers[FORWARDED_TO_HEADER_KEY_L] as string;
 
-    const cForwardedFor    = concatHeader(this.producer, forwarededFor);
-    const cForwardedPort   = concatHeader(PORT_STRING, forwarededPort);
-    const cForwardedProto  = concatHeader('http', forwarededProto);
+    const cForwardedFor    = concatHeader(forwarededFor, this.producer);
+    const cForwardedPort   = concatHeader(forwarededPort, PORT_STRING);
+    const cForwardedProto  = concatHeader(forwarededProto, 'http');
 
     req.headers[FORWARDED_FOR_KEY_L]    = cForwardedFor;
     req.headers[FORWARDED_PORT_KEY_L]   = cForwardedPort;
