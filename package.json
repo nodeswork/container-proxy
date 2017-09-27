@@ -1,6 +1,6 @@
 {
   "name": "@nodeswork/container-proxy",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Container proxy for applet to access network",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
