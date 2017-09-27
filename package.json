@@ -2,8 +2,12 @@
   "name": "@nodeswork/container-proxy",
   "version": "0.0.17",
   "description": "Container proxy for applet to access network",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "rm -rf dist/ && ./node_modules/.bin/gulp",
+    "prepublish": "npm test && npm run build",
+    "start": "NAM_HOST=`hostname`:28310 node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,8 +25,21 @@
   },
   "homepage": "https://github.com/nodeswork/container-proxy#readme",
   "dependencies": {
+    "@nodeswork/applet": "0.0.6",
     "@nodeswork/logger": "^0.1.1",
+    "@nodeswork/sbase": "^0.1.25",
+    "@nodeswork/utils": "0.0.8",
+    "@types/http-proxy": "^1.12.1",
     "http-proxy": "^1.16.2",
     "ip": "^1.1.5"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.43",
+    "@types/should": "^11.2.0",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^3.2.2",
+    "mocha": "^3.5.3",
+    "should": "^13.1.0",
+    "typescript": "^2.5.3"
   }
 }
