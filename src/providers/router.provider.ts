@@ -10,15 +10,25 @@ import * as logger        from '@nodeswork/logger';
 import * as sbase         from '@nodeswork/sbase';
 import { NodesworkError } from '@nodeswork/utils';
 
-const LOG               = logger.getLogger();
-const SUB_NET                  = process.env.SUB_NET;
-const NAM_HOST                 = process.env.NAM_HOST;
-const NA_PREFIX                = 'na-';
-const HOSTNAME                 = os.hostname();
-const proxy                    = httpProxy.createProxyServer({});
-const FORWARDED_TO_HEADER_KEY  = sbase.constants.headers.request
-  .NODESWORK_FORWARDED_TO.toLowerCase();
-const BAD_HEADER_ERROR         = NodesworkError.badRequest(
+const PORT_STRING                 = process.env.PORT || '80';
+const LOG                         = logger.getLogger();
+const SUB_NET                     = process.env.SUB_NET;
+const NAM_HOST                    = process.env.NAM_HOST;
+const NA_PREFIX                   = 'na-';
+const HOSTNAME                    = os.hostname();
+const proxy                       = httpProxy.createProxyServer({});
+const HEADER_CONSTS               = sbase.constants.headers.request;
+
+const FORWARDED_TO_HEADER_KEY     = HEADER_CONSTS.NODESWORK_FORWARDED_TO;
+const FORWARDED_TO_HEADER_KEY_L   = HEADER_CONSTS.NODESWORK_FORWARDED_TO.toLowerCase();
+const FORWARDED_FOR_KEY           = HEADER_CONSTS.X_FORWARDED_FOR;
+const FORWARDED_FOR_KEY_L         = HEADER_CONSTS.X_FORWARDED_FOR.toLowerCase();
+const FORWARDED_PROTO_KEY         = HEADER_CONSTS.X_FORWARDED_PROTO;
+const FORWARDED_PROTO_KEY_L       = HEADER_CONSTS.X_FORWARDED_PROTO.toLowerCase();
+const FORWARDED_PORT_KEY          = HEADER_CONSTS.X_FORWARDED_PORT;
+const FORWARDED_PORT_KEY_L        = HEADER_CONSTS.X_FORWARDED_PORT.toLowerCase();
+
+const BAD_HEADER_ERROR            = NodesworkError.badRequest(
   `Unkown header ${sbase.constants.headers.request.NODESWORK_FORWARDED_TO}`
 );
 
@@ -47,12 +57,22 @@ export class RouterProvider {
       method:   req.method,
     });
 
-    let forwarededTo = req.headers[FORWARDED_TO_HEADER_KEY];
-    console.log(forwarededTo);
+    let forwarededFor    = req.headers[FORWARDED_FOR_KEY_L]       as string;
+    let forwarededPort   = req.headers[FORWARDED_PORT_KEY_L]      as string;
+    let forwarededProto  = req.headers[FORWARDED_PROTO_KEY_L]     as string;
+    let forwarededTo     = req.headers[FORWARDED_TO_HEADER_KEY_L] as string;
 
-    if (_.isArray(forwarededTo)) {
-      forwarededTo = forwarededTo[0];
-    }
+    const cForwardedFor    = concatHeader(this.producer, forwarededFor);
+    const cForwardedPort   = concatHeader(PORT_STRING, forwarededPort);
+    const cForwardedProto  = concatHeader('http', forwarededProto);
+
+    req.headers[FORWARDED_FOR_KEY_L]    = cForwardedFor;
+    req.headers[FORWARDED_PORT_KEY_L]   = cForwardedPort;
+    req.headers[FORWARDED_PROTO_KEY_L]  = cForwardedProto;
+
+    res.setHeader(FORWARDED_FOR_KEY, cForwardedFor);
+    res.setHeader(FORWARDED_PORT_KEY, cForwardedPort);
+    res.setHeader(FORWARDED_PROTO_KEY, cForwardedProto);
 
     if (forwarededTo == null) {
       return this.appCallback(req, res);
@@ -93,7 +113,7 @@ export class RouterProvider {
       } else {
         throw BAD_HEADER_ERROR;
       }
-      console.log('target', target);
+      LOG.info('resolveing target', { target });
 
       proxy.web(req, res, { target }, (err) => {
         processingError(err);
@@ -103,4 +123,8 @@ export class RouterProvider {
       processingError(e);
     }
   }
+}
+
+function concatHeader(...args: string[]): string {
+  return _.filter(args, (x) => x as any as boolean).join('; ');
 }
