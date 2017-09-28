@@ -109,7 +109,7 @@ export class RouterProvider {
       if (forwarededTo.startsWith('na-')) {
         target = `http://${forwarededTo}`;
       } else if (forwarededTo === 'nam') {
-        target = NAM_HOST;
+        target = `http://${NAM_HOST}`;
       } else {
         throw BAD_HEADER_ERROR;
       }
